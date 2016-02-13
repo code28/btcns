@@ -1,0 +1,2 @@
+# btcns
+Bitcoin Name System
