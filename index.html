@@ -7,52 +7,9 @@
     <meta name="description" content="Retrieve BTC address of a user, verified by an account at Twitter, GitHub etc.">
     <meta name="author" content="Simon Kempendorf">
     <title>Bitcoin Name System</title>
-    
+
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
-
-    <style type="text/css">
-html {
-  position: relative;
-  min-height: 100%;
-}
-body {
-  /* Margin bottom by footer height */
-  margin-bottom: 40px;
-}
-.container {
-	width:auto;
-	max-width: 680px;
-}
-.topmargin {
-	margin-top: 4%;
-}
-.topmargin-s {
-	margin-top: 1em;
-}
-.footer {
-  position: absolute;
-  bottom: 1px;
-  width: 100%;
-  min-height: 40px;
-  border-top: 1px solid #e4e4e4;
-  line-height: 40px;
-}
-.footer, .footer > .container {
-  background-color: #f2f2f2;
-}
-.footer a {
-	padding-left:27px;
-}
-.footer a:hover {
-	text-decoration: underline;
-}
-.favicon {
-	width: 16px;
-	height: 16px;
-	margin-right: 8px;
-}
-    </style>
-
+    <link href="style.css" rel="stylesheet">
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
@@ -63,29 +20,35 @@ body {
   <body>
 
     <div class="container topmargin">
+
       <div class="page-header">
         <h1>Bitcoin Name Service <small>via <a href="https://keybase.io" target="_blank">keybase.io</a></small></h1>
       </div>
+
       <p class="lead">
-        You want to send bitcoin to someone, but you only know the account name e.g. at Twitter or at GitHub? If that user put a bitcoin address on keybase.io, this is easy. Get the bitcoin address here:</p>
-      <p>
-    <div class="input-group">
-      <div class="input-group-btn">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="btnService" value="usernames"><img src="https://keybase.io/favicon.ico" class="favicon" id="imgService"> <span class="caret"></span></button>
-        <ul class="dropdown-menu">
-          <li><a href="#"><img src="https://keybase.io/favicon.ico" class="favicon" title="usernames"> Keybase.io</a></li>
-          <li><a href="#"><img src="https://cdn3.iconfinder.com/data/icons/happily-colored-snlogo/128/twitter.png" class="favicon" title="twitter"> Twitter.com</a></li>
-          <li><a href="#"><img src="https://github.com/favicon.ico" class="favicon" title="github"> GitHub.com</a></li>
-        </ul>
-      </div><!-- /btn-group -->
-      <input type="text" class="form-control" placeholder="account name" id="inputAccount">
-    </div><!-- /input-group -->
-      <p class="text-center topmargin-s">
-		<button type="button" class="btn btn-primary" id="btnRetrieve">Retrieve BTC address</button></p>
+        You want to send bitcoin to someone, but you only know the account name e.g. at Twitter or at GitHub? If that user put a bitcoin address on keybase.io, this is easy. Get the bitcoin address here:
       </p>
+
+      <div class="input-group">
+    	<div class="input-group-btn">
+		  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="btnService" value="usernames"><img src="https://keybase.io/favicon.ico" class="favicon" id="imgService"> <span class="caret"></span></button>
+		  <ul class="dropdown-menu">
+			<li><a href="#"><img src="https://keybase.io/favicon.ico" class="favicon" title="usernames"> Keybase.io</a></li>
+			<li><a href="#"><img src="https://cdn3.iconfinder.com/data/icons/happily-colored-snlogo/128/twitter.png" class="favicon" title="twitter"> Twitter.com</a></li>
+			<li><a href="#"><img src="https://github.com/favicon.ico" class="favicon" title="github"> GitHub.com</a></li>
+		  </ul>
+      	</div>
+      	<input type="text" class="form-control" placeholder="account name" id="inputAccount">
+      </div>
+
+      <p class="text-center topmargin-s">
+		<button type="button" class="btn btn-primary" id="btnRetrieve">Retrieve BTC address</button>
+	  </p>
+
     </div>
-    <div id="divResults" class="container topmargin">
-    	<div id="divResult" class="alert alert-success hidden">Results...</div>
+
+    <div class="container topmargin">
+    	<div id="divResult" class="alert alert-success hidden"><img src="ajax-loader.gif"></div>
     </div>
 
     <footer class="footer">
@@ -105,44 +68,7 @@ body {
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-	<script type="text/javascript">
-	$('.dropdown-menu').children().children().click(function() {
-		var title = $(this).children().attr('title');
-		$('#imgService').attr('src', $('img[title="' + title + '"]').attr('src'));
-		$('#btnService').val(title);
-	});
-	$('#btnRetrieve').click(function() {
-		$('#divResult').removeClass('hidden');
-		$('#divResult').addClass('text-center').html('<img src="ajax-loader.gif">');
+	<script src="script.js"></script>
 
-		$.ajax({
-			url: "https://keybase.io/_/api/1.0/user/lookup.json?"
-					+ $('#btnService').val()
-					+ "=" + $('#inputAccount').val()
-					+ "&fields=cryptocurrency_addresses",
-			method: "GET",
-			dataType: "json"
-		}).done(function( obj ) {
-			if (obj.them && obj.them !== null && obj.them.length > 0)
-			{
-				var cca = obj.them[0].cryptocurrency_addresses;
-				if (cca.bitcoin)
-				{
-					$('#divResult').html(cca.bitcoin[0].address);
-				}
-				else
-				{					
-					$('#divResult').html('No BTC address found.');
-				}
-			}
-			else
-			{
-				$('#divResult').html('No BTC address found.');
-			}
-		}).fail(function( jqXHR, textStatus ) {
-			$('#divResult').html('Request failed: ' + textStatus);
-		});
-	});
-	</script>
   </body>
 </html>
