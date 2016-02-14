@@ -6,10 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Retrieve BTC address of a user, verified by an account at Twitter, GitHub etc.">
     <meta name="author" content="Simon Kempendorf">
-
     <title>Bitcoin Name System</title>
-
-    <!-- Bootstrap core CSS -->
+    
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
 
     <style type="text/css">
@@ -73,21 +71,21 @@ body {
       <p>
     <div class="input-group">
       <div class="input-group-btn">
-        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img src="https://keybase.io/favicon.ico" class="favicon"> <span class="caret"></span></button>
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" id="btnService" value="usernames"><img src="https://keybase.io/favicon.ico" class="favicon" id="imgService"> <span class="caret"></span></button>
         <ul class="dropdown-menu">
-          <li><a href="#"><img src="https://keybase.io/favicon.ico" class="favicon"> Keybase.io</a></li>
-          <li><a href="#"><img src="https://cdn3.iconfinder.com/data/icons/happily-colored-snlogo/128/twitter.png" class="favicon"> Twitter.com</a></li>
-          <li><a href="#"><img src="https://github.com/favicon.ico" class="favicon"> GitHub.com</a></li>
+          <li><a href="#"><img src="https://keybase.io/favicon.ico" class="favicon" title="usernames"> Keybase.io</a></li>
+          <li><a href="#"><img src="https://cdn3.iconfinder.com/data/icons/happily-colored-snlogo/128/twitter.png" class="favicon" title="twitter"> Twitter.com</a></li>
+          <li><a href="#"><img src="https://github.com/favicon.ico" class="favicon" title="github"> GitHub.com</a></li>
         </ul>
       </div><!-- /btn-group -->
-      <input type="text" class="form-control" placeholder="account name">
+      <input type="text" class="form-control" placeholder="account name" id="inputAccount">
     </div><!-- /input-group -->
       <p class="text-center topmargin-s">
-		<button type="button" class="btn btn-primary">Retrieve BTC address</button></p>
+		<button type="button" class="btn btn-primary" id="btnRetrieve">Retrieve BTC address</button></p>
       </p>
     </div>
-    <div class="container topmargin hidden">
-    	<div class="alert alert-success">Results...</div>
+    <div id="divResults" class="container topmargin">
+    	<div id="divResult" class="alert alert-success hidden">Results...</div>
     </div>
 
     <footer class="footer">
@@ -107,5 +105,44 @@ body {
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+	$('.dropdown-menu').children().children().click(function() {
+		var title = $(this).children().attr('title');
+		$('#imgService').attr('src', $('img[title="' + title + '"]').attr('src'));
+		$('#btnService').val(title);
+	});
+	$('#btnRetrieve').click(function() {
+		$('#divResult').removeClass('hidden');
+		$('#divResult').addClass('text-center').html('<img src="ajax-loader.gif">');
+
+		$.ajax({
+			url: "https://keybase.io/_/api/1.0/user/lookup.json?"
+					+ $('#btnService').val()
+					+ "=" + $('#inputAccount').val()
+					+ "&fields=cryptocurrency_addresses",
+			method: "GET",
+			dataType: "json"
+		}).done(function( obj ) {
+			if (obj.them && obj.them !== null && obj.them.length > 0)
+			{
+				var cca = obj.them[0].cryptocurrency_addresses;
+				if (cca.bitcoin)
+				{
+					$('#divResult').html(cca.bitcoin[0].address);
+				}
+				else
+				{					
+					$('#divResult').html('No BTC address found.');
+				}
+			}
+			else
+			{
+				$('#divResult').html('No BTC address found.');
+			}
+		}).fail(function( jqXHR, textStatus ) {
+			$('#divResult').html('Request failed: ' + textStatus);
+		});
+	});
+	</script>
   </body>
 </html>
