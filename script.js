@@ -26,7 +26,7 @@ $('#btnRetrieve').click(function() {
 				{
 					result += '<div class="col-md-4"><img src="' + user.pictures.primary.url + '" class="img-circle"></div>';
 				}
-				result += '<div class="col-md-offset-1777 col-md-8 text-left">'
+				result += '<div class="col-md-8 text-left">'
 							+ '<h3>' + user.profile.full_name + ' (' + user.basics.username_cased + ')</h3>';
 				if (bc)
 				{
